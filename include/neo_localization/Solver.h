@@ -25,7 +25,6 @@ SOFTWARE.
 #ifndef INCLUDE_SOLVER_H_
 #define INCLUDE_SOLVER_H_
 
-#include <neo_common2/Matrix.h>
 #include <neo_localization/Util.h>
 #include <neo_localization/GridMap.h>
 
