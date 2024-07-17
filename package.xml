@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
     <name>neo_localization2</name>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
     <description>
-		Platform localization node based on laser sensors and a grid map.
+	Platform localization node based on laser sensors and a grid map.
     </description>
     <author>Max Wittal</author>
     <maintainer email="ros@neobotix.de">Neobotix GmbH</maintainer>
