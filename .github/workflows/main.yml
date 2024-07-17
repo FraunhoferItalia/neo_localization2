@@ -35,7 +35,6 @@ jobs:
           target-ros2-distro: humble
           package-name: neo_localization2
           skip-tests: true
-          vcs-repo-file-url: "${{ github.workspace }}/.github/workflows/ros_deps.repos"
           colcon-defaults: |
             {
               "build": {
