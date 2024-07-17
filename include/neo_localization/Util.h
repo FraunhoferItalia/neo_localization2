@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef INCLUDE_NEO_LOCALIZATION_UTIL_H_
 #define INCLUDE_NEO_LOCALIZATION_UTIL_H_
 
-#include <neo_common2/Matrix.h>
+#include <neo_localization/Matrix.h>
 
 #include <vector>
 
