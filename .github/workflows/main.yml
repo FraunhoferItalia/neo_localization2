@@ -20,15 +20,15 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:jammy
+      image: ubuntu:noble
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v2
-      - uses: ros-tooling/setup-ros@0.3.4
+      - uses: ros-tooling/setup-ros@0.7.7
         with:
           use-ros2-testing: false
-      - uses: ros-tooling/action-ros-ci@0.2.6
+      - uses: ros-tooling/action-ros-ci@0.3.13
         with:
           target-ros2-distro: rolling
           package-name: neo_localization2
