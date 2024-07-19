@@ -141,6 +141,18 @@ public:
     this->declare_parameter<std::string>("initialpose", "initialpose");
     this->get_parameter("initialpose", m_initial_pose);
 
+    this->declare_parameter<bool>("set_initial_pose", false);
+    this->get_parameter("set_initial_pose", m_set_initial_pose);
+
+    this->declare_parameter<double>("initia_pose.x", 0.0);
+    this->get_parameter("initia_pose.x", m_offset_x);
+
+    this->declare_parameter<double>("initia_pose.y", 0.0);
+    this->get_parameter("initia_pose.y", m_offset_y);
+
+    this->declare_parameter<double>("initia_pose.yaw", 0.0);
+    this->get_parameter("initia_pose.yaw", m_offset_yaw);
+
     this->declare_parameter<std::string>("map_tile", "map_tile");
     this->get_parameter("map_tile", m_map_tile);
 
@@ -310,8 +322,14 @@ protected:
     pose_array.header.frame_id = m_map_frame;
 
     // calc predicted grid pose based on odometry
+    Matrix<double, 3, 1> grid_pose; 
+    try {
+      grid_pose = (m_grid_to_map.inverse() * T * L * Matrix<double, 4, 1>{0, 0, 0, 1}).project();
+    } catch(const std::exception& ex) {
+        RCLCPP_WARN_STREAM(this->get_logger(),"NeoLocalizationNode waiting for map updates " << ex.what());
+        return;
+    }
 
-    const Matrix<double, 3, 1> grid_pose = (m_grid_to_map.inverse() * T * L * Matrix<double, 4, 1>{0, 0, 0, 1}).project();
     // setup distributions
     std::normal_distribution<double> dist_x(grid_pose[0], m_sample_std_xy);
     std::normal_distribution<double> dist_y(grid_pose[1], m_sample_std_xy);
@@ -673,12 +691,18 @@ protected:
     RCLCPP_INFO_ONCE(this->get_logger(),"NeoLocalizationNode: Activating map update loop");
 
     rclcpp::Rate loop_rate(m_map_update_rate);
-    while(rclcpp::ok()) {
-      try {
-        update_map(); // get a new map tile periodically
-      }
-      catch(const std::exception& ex) {
-        RCLCPP_WARN_STREAM(this->get_logger(),"NeoLocalizationNode: update_map() failed:");
+    while (rclcpp::ok()) {
+      if (!m_initialized && !m_set_initial_pose) {
+        RCLCPP_WARN_STREAM(this->get_logger(), "Is the robot pose initialized?");
+      } else {
+        if (!m_initialized) {
+          RCLCPP_INFO_ONCE(this->get_logger(), "Using the config init pose");
+        }
+        try {
+          update_map(); // get a new map tile periodically
+        } catch (const std::exception& ex) {
+          RCLCPP_WARN_STREAM(this->get_logger(), "NeoLocalizationNode: update_map() failed:");
+        }
       }
       loop_rate.sleep();
     }
@@ -727,6 +751,7 @@ private:
 
   bool m_broadcast_tf = false;
   bool m_initialized = false;
+  bool m_set_initial_pose = false;
   std::string m_base_frame;
   std::string m_odom_frame;
   std::string m_map_frame;
