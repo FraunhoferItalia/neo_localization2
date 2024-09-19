@@ -156,6 +156,9 @@ public:
     this->declare_parameter<bool>("broadcast_info", false);
     this->get_parameter("broadcast_info", m_broadcast_info);
 
+    this->declare_parameter<bool>("add_namespace_to_frames", true);
+    this->get_parameter("add_namespace_to_frames", m_add_namespace_to_frames);
+
     m_map_update_thread = std::thread(&NeoLocalizationNode::update_loop, this);
 
     m_tf_broadcaster = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -183,8 +186,10 @@ public:
     robot_namespace.erase(std::remove(robot_namespace.begin(), robot_namespace.end(), '/'), 
     robot_namespace.end());
 
-    m_base_frame = robot_namespace + m_base_frame;
-    m_odom_frame = robot_namespace + m_odom_frame;
+    if (m_add_namespace_to_frames) {
+      m_base_frame = robot_namespace + m_base_frame;
+      m_odom_frame = robot_namespace + m_odom_frame;
+    }
   }
 
   ~NeoLocalizationNode()
@@ -728,6 +733,7 @@ private:
 
   bool m_broadcast_tf = false;
   bool m_initialized = false;
+  bool m_add_namespace_to_frames = true;
   std::string m_base_frame;
   std::string m_odom_frame;
   std::string m_map_frame;
